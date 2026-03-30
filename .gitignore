@@ -1,0 +1,10 @@
+# Create .gitignore file
+@"
+venv/
+__pycache__/
+*.pyc
+data/*.csv
+email_scores.txt
+.vscode/
+.idea/
+"@ | Out-File -FilePath .gitignore -Encoding utf8

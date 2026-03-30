@@ -1,0 +1,119 @@
+name: phishing-email-detector
+version: 1.0.0
+author: M Abhilash Kumar
+description: Detect phishing emails using rule-based analysis with domain trust verification
+
+environment:
+  class: PhishingEnvironment
+  path: inference.py
+  config:
+    dataset_path: data/phishing_dataset.csv
+
+tasks:
+  - id: 1
+    name: Basic Phishing Detection
+    description: Detect obvious phishing emails with clear suspicious signs like urgency words and suspicious links
+    difficulty: easy
+    max_attempts: 3
+    reward_threshold: 0.7
+    
+  - id: 2
+    name: Advanced Pattern Detection
+    description: Detect urgency tactics, malicious links, and domain impersonation
+    difficulty: medium
+    max_attempts: 3
+    reward_threshold: 0.8
+    
+  - id: 3
+    name: Sophisticated Spear-Phishing
+    description: Detect subtle phishing attempts including fake domain impersonation and legitimate security alert differentiation
+    difficulty: hard
+    max_attempts: 5
+    reward_threshold: 0.9
+
+observation_space:
+  type: object
+  properties:
+    email_content:
+      type: string
+      description: Full email text content
+    sender_domain:
+      type: string
+      description: Sender's email domain
+    subject_line:
+      type: string
+      description: Email subject line
+    has_links:
+      type: boolean
+      description: Whether email contains URLs
+    link_count:
+      type: integer
+      description: Number of links in email
+    links:
+      type: array
+      items:
+        type: string
+      description: List of all URLs in email
+    urgency_words:
+      type: array
+      items:
+        type: string
+      description: Urgency-related words detected
+    suspicious_patterns:
+      type: array
+      items:
+        type: string
+      description: Detected suspicious patterns
+
+action_space:
+  type: object
+  properties:
+    phishing_score:
+      type: number
+      minimum: 0.0
+      maximum: 1.0
+      description: Probability that email is phishing (0-1)
+    classification:
+      type: string
+      enum:
+        - phishing
+        - legitimate
+      description: Final classification of the email
+    suspicious_elements:
+      type: array
+      items:
+        type: string
+      description: List of suspicious elements detected
+    confidence:
+      type: number
+      minimum: 0.0
+      maximum: 1.0
+      description: Agent's confidence in the classification
+    reasoning:
+      type: string
+      description: Explanation for the classification
+
+reward_config:
+  description: Partial rewards based on correct detection and suspicious element identification
+  components:
+    correct_classification:
+      weight: 0.5
+      description: Reward for correctly identifying phishing vs legitimate
+    suspicious_elements:
+      weight: 0.3
+      description: Bonus for detecting suspicious elements
+    confidence:
+      weight: 0.2
+      description: Bonus for high confidence in correct predictions
+  threshold: 0.4
+  description: Score above 0.4 is classified as phishing
+
+evaluation:
+  metrics:
+    - accuracy
+    - phishing_score
+    - confidence
+  output:
+    - score
+    - classification
+    - suspicious_elements
